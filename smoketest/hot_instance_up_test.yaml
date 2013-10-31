@@ -1,0 +1,53 @@
+heat_template_version: 2013-05-23
+
+description: >
+  HOT template to deploy one server into an existing neutron tenant network and
+  assign floating IP addresses to it  so it routable from the
+  public network.
+
+parameters:
+  public_net_id:
+    type: string
+    description: ID of public network for which floating IP addresses will be allocated
+  private_net_id:
+    type: string
+    description: ID of private network into which servers get deployed
+  private_subnet_id:
+    type: string
+    description: ID of private sub network into which servers get deployed
+  SecGrp:
+    type: string
+    description: ID of a security group into which servers get deployed
+
+resources:
+  server1:
+    type: OS::Nova::Server
+    properties:
+      name: hot_instance_up_test
+      image: ubuntu-12.04-image
+      flavor: heat-smoketest-flavor
+      key_name: heat-smoketest
+      security_groups: [{ get_param: SecGrp}]
+      networks:
+        - port: { get_resource: server1_port }
+
+  server1_port:
+    type: OS::Neutron::Port
+    properties:
+      network_id: { get_param: private_net_id }
+      fixed_ips:
+        - subnet_id: { get_param: private_subnet_id }
+
+  server1_floating_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network_id: { get_param: public_net_id }
+      port_id: { get_resource: server1_port }
+
+outputs:
+  server1_private_ip:
+    description: IP address of server1 in private network
+    value: { get_attr: [ server1, first_address ] }
+  server1_public_ip:
+    description: Floating IP address of server1 in public network
+    value: { get_attr: [ server1_floating_ip, floating_ip_address ] }

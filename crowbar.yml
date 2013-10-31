@@ -24,6 +24,9 @@ barclamp:
     - database
     - rabbitmq
     - keystone
+    - neutron
+    - cinder
+    - glance
   member:
     - openstack 
   os_support:
@@ -46,6 +49,9 @@ debs:
     - python-heat
     - python-heatclient
     - python-keystone
+    - heat-api-cfn
+    - heat-api-cloudwatch
+    - heat-common
 
 locale_additions:
   en:
