@@ -76,7 +76,6 @@ cleanup() {
             while heat list |grep -q "$stack_id"; do sleep 1; done
         done
         nova keypair-delete "$tested_service_name-smoketest"
-        ssh-agent -k
         nova flavor-delete "$test_flavor"
        for g in $(neutron security-group-list | grep 'heat*' | awk {'print $2'}); do
          echo -e "Deleting security group: $g"
